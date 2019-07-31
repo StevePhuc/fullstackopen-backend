@@ -39,6 +39,19 @@ app.get("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
     const person = req.body;
+
+    if (!person.name || !person.number) {
+        console.log(person.name);
+        console.log(person.number);
+
+        return res.status(400).json({ error: "name or number is missing" });
+    }
+
+    findDuplicate = persons.find(item => item.name === person.name);
+    if (findDuplicate) {
+        return res.status(400).json({ error: "name must be unique" });
+    }
+
     const randomId = Math.floor(Math.random() * 100000);
     person.id = randomId;
     persons = [...persons, person];
