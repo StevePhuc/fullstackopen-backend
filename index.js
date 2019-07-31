@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
 
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
+
 let persons = [
     {
         name: "Arto Hellas",
@@ -32,6 +35,14 @@ app.get("/api/persons/:id", (req, res) => {
 
     const findPerson = persons.find(person => person.id === id);
     findPerson ? res.json(findPerson) : res.status(404).end();
+});
+
+app.post("/api/persons", (req, res) => {
+    const person = req.body;
+    const randomId = Math.floor(Math.random() * 100000);
+    person.id = randomId;
+    persons = [...persons, person];
+    res.json(persons);
 });
 
 app.delete("/api/person/:id", (req, res) => {
