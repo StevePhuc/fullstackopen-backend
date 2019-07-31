@@ -34,6 +34,12 @@ app.get("/api/persons/:id", (req, res) => {
     findPerson ? res.json(findPerson) : res.status(404).end();
 });
 
+app.delete("/api/person/:id", (req, res) => {
+    const id = Number(req.params.id);
+    persons = persons.filter(person => person.id !== id);
+    res.status(204).end();
+});
+
 app.get("/api/info", (req, res) => {
     const html = `
     <p>Phonebook has info for ${persons.length} people</p>
