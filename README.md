@@ -1,2 +1,2 @@
 #Link for Api
-https://calm-gorge-89983.herokuapp.com/api/persons
+https://calm-gorge-89983.herokuapp.com/
