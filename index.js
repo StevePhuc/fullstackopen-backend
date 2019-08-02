@@ -1,8 +1,11 @@
 const express = require("express");
+require("dotenv").config();
+
 const app = express();
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
 
 const cors = require("cors");
-
 app.use(cors());
 app.use(express.static("build"));
 
@@ -29,8 +32,12 @@ let persons = [
     }
 ];
 
+const Person = require("./models/person");
+
 app.get("/api/persons", (req, res) => {
-    res.json(persons);
+    Person.find({}).then(persons => {
+        res.json(persons.map(person => person.toJSON()));
+    });
 });
 app.get("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id);
@@ -53,7 +60,27 @@ app.get("/api/info", (req, res) => {
     res.send(html);
 });
 
-const PORT = process.env.PORT || 3001;
+app.post("/api/persons", (request, response) => {
+    const body = request.body;
+    const { name, number } = body;
+    console.log(body);
+
+    if (name === undefined || number == undefined) {
+        return response.status(400).json({ error: "content missing" });
+    }
+
+    const person = new Person({
+        name,
+        number
+    });
+    person.save().then(response => {
+        console.log(`added ${name} number ${number} to phonebook`);
+        res.status(204).end();
+        // mongoose.connection.close();
+    });
+});
+
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
