@@ -7,7 +7,12 @@ app.use(bodyParser.json());
 const morgan = require("morgan");
 app.use(
     morgan(function(tokens, req, res) {
-        const person = req.body;
+        let postObject = "";
+        if (tokens.method(req, res) === "POST") {
+            const person = req.body;
+            postObject = JSON.stringify(person);
+        }
+
         return [
             tokens.method(req, res),
             tokens.url(req, res),
@@ -16,7 +21,7 @@ app.use(
             "-",
             tokens["response-time"](req, res),
             "ms",
-            JSON.stringify(person)
+            postObject
         ].join(" ");
     })
 );
