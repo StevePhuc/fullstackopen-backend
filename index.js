@@ -60,13 +60,13 @@ app.get("/api/info", (req, res) => {
     res.send(html);
 });
 
-app.post("/api/persons", (request, response) => {
-    const body = request.body;
+app.post("/api/persons", (req, res) => {
+    const body = req.body;
     const { name, number } = body;
     console.log(body);
 
     if (name === undefined || number == undefined) {
-        return response.status(400).json({ error: "content missing" });
+        return res.status(400).json({ error: "content missing" });
     }
 
     const person = new Person({
@@ -75,7 +75,10 @@ app.post("/api/persons", (request, response) => {
     });
     person.save().then(response => {
         console.log(`added ${name} number ${number} to phonebook`);
-        res.status(204).end();
+        res.json({
+            name,
+            number
+        });
         // mongoose.connection.close();
     });
 });
