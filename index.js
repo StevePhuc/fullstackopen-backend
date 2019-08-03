@@ -94,7 +94,7 @@ app.get("/api/info", (req, res) => {
     });
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
     const body = req.body;
     const { name, number } = body;
     console.log(body);
@@ -107,17 +107,20 @@ app.post("/api/persons", (req, res) => {
         name,
         number
     });
-    person.save().then(response => {
-        console.log(response);
+    person
+        .save()
+        .then(response => {
+            console.log(response);
 
-        console.log(`added ${name} number ${number} to phonebook`);
-        res.json({
-            name,
-            number,
-            id: response._id
-        });
-        // mongoose.connection.close();
-    });
+            console.log(`added ${name} number ${number} to phonebook`);
+            res.json({
+                name,
+                number,
+                id: response._id
+            });
+            // mongoose.connection.close();
+        })
+        .catch(error => next(error));
 });
 
 app.put("/api/persons/:id", (req, res) => {
@@ -136,6 +139,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === "CastError" && error.kind == "ObjectId") {
         return response.status(400).send({ error: "malformatted id" });
+    } else if (error.name === "ValidationError") {
+        return response.status(400).json({ error: error.message });
     }
 
     next(error);

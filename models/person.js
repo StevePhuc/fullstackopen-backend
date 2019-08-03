@@ -16,9 +16,9 @@ mongoose
     });
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
-    id: Number
+    name: { type: String, required: true, unique: true },
+    number: { type: Number, required: true },
+    id: { type: Number }
 });
 
 personSchema.set("toJSON", {
@@ -28,5 +28,8 @@ personSchema.set("toJSON", {
         delete returnedObject.__v;
     }
 });
+
+var uniqueValidator = require("mongoose-unique-validator");
+personSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("Person", personSchema);
