@@ -61,33 +61,19 @@ app.get("/api/persons", (req, res) => {
         res.json(persons.map(person => person.toJSON()));
     });
 });
-app.get("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
+app.get("/api/persons/:id", (req, res, next) => {
+    Person.findById(req.params.id)
+        .then(person => {
+            console.log(person);
 
-    const findPerson = persons.find(person => person.id === id);
-    findPerson ? res.json(findPerson) : res.status(404).end();
+            if (person) {
+                res.json(person.toJSON());
+            } else {
+                res.status(404).end();
+            }
+        })
+        .catch(error => next(error));
 });
-
-// app.post("/api/persons", (req, res) => {
-//     const person = req.body;
-
-//     if (!person.name || !person.number) {
-//         console.log(person.name);
-//         console.log(person.number);
-
-//         return res.status(400).json({ error: "name or number is missing" });
-//     }
-
-//     findDuplicate = persons.find(item => item.name === person.name);
-//     if (findDuplicate) {
-//         return res.status(400).json({ error: "name must be unique" });
-//     }
-
-//     const randomId = Math.floor(Math.random() * 100000);
-//     person.id = randomId;
-//     persons = [...persons, person];
-//     res.json(persons);
-// });
 
 app.delete("/api/persons/:id", (req, res, next) => {
     Person.findByIdAndRemove(req.params.id)
@@ -99,11 +85,13 @@ app.delete("/api/persons/:id", (req, res, next) => {
 });
 
 app.get("/api/info", (req, res) => {
-    const html = `
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date()}</p>
-    `;
-    res.send(html);
+    Person.find({}).then(persons => {
+        const html = `
+        <p>Phonebook has info for ${persons.length} people</p>
+        <p>${new Date()}</p>
+        `;
+        res.send(html);
+    });
 });
 
 app.post("/api/persons", (req, res) => {
@@ -120,10 +108,13 @@ app.post("/api/persons", (req, res) => {
         number
     });
     person.save().then(response => {
+        console.log(response);
+
         console.log(`added ${name} number ${number} to phonebook`);
         res.json({
             name,
-            number
+            number,
+            id: response._id
         });
         // mongoose.connection.close();
     });
