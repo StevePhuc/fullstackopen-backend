@@ -129,6 +129,17 @@ app.post("/api/persons", (req, res) => {
     });
 });
 
+app.put("/api/persons/:id", (req, res) => {
+    const body = req.body;
+    const { name, number } = body;
+
+    Person.findByIdAndUpdate(req.params.id, { name, number }, { new: true })
+        .then(updatedNote => {
+            res.json(updatedNote.toJSON());
+        })
+        .catch(error => next(error));
+});
+
 const errorHandler = (error, request, response, next) => {
     console.error(error.message);
 
